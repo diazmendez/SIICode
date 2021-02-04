@@ -36,18 +36,14 @@ namespace protocols {
 
 
 
-    dataThermal thermal(ISystem &system, double T, int initial_steps, int steps,
-                        int measures, std::string algorithm, int samples=1){
+    dataThermal thermal(ISystem &system, double T,
+                        int conf, // keep initial with -7  
+                        int initial_steps, int steps,
+                        int measures, std::string algorithm, 
+                        int samples=1){
 
         dataThermal outcome;
 
-        ISystem sys0(system.l);
-        sys0.copy_conf(system);
-
-        //sys0->print_sys();
-        sys0.print_sys();
-        std::cout << "-- || --" << std::endl;
-        system.print_sys();
 
 
 
@@ -63,20 +59,30 @@ namespace protocols {
         // set temperature                    
         system.T=T;
 
-        // perform initial steps
-        if (algorithm=="metro"){
-            system.metro_flips(system.l2*initial_steps);  
-        } else{
-
+        // keep featured initial configuration 
+        ISystem sys0(system.l);
+        if (conf == -7) {
+            sys0.copy_conf(system);
         }
 
-
         int msteps = (int) steps/measures;
+
         for (int s=0; s<samples; s++){                
 
-            //auto system=sys0;
 
-            //system.print_sys();
+            if (conf!=-7) {
+                system.set_conf(conf);
+            } else {
+                system.copy_conf(sys0); // senseless for s=0
+            }
+
+
+            // perform initial steps
+            if (algorithm=="metro"){
+                system.metro_flips(system.l2*initial_steps);  
+            } else{
+
+            }
 
             // perform the n measures
             for (int i=0; i<measures; i++){
@@ -136,42 +142,17 @@ int main(){
     ISystem thesystem(l);
 
     thesystem.set_conf(0);
-/*
-    for (int i = 0; i < l2; i++){
-        std::cout << "site: " << i 
-        << "\t spi n: " << thesystem.site[i].spin 
-        << "\t neigh 0: " << thesystem.site[i].neighbour[0] 
-        << "\t field: " << thesystem.site[i].field << std::endl;
-    }
-
-    std::cout << "--> nenergy: " << thesystem.nenergy() << std::endl;
-    std::cout << "--> nmagnet: " << thesystem.nmagnet() << std::endl;
-
-
-    thesystem.print_sys();
-
-    thesystem.metro_flips(20);
-
-    thesystem.print_sys();
-
-
-    std::cout << "nenergy: " << thesystem.nenergy() 
-    << " \t temperature: " << thesystem.T <<std::endl;
-
-    thesystem.set_conf(1);
-    std::cout << "----> nenergy: " << thesystem.nenergy() << std::endl;
-
-*/    
+    
     std::cout << "  -----------------------------  " << std::endl;
 
     protocols::dataThermal  mydatat;
 
-    thesystem.set_conf(0);
-    mydatat = protocols::thermal(thesystem,1.8,
+    mydatat = protocols::thermal(thesystem, 1.8, // temperature
+                                    0, // configuration (featured -7)
                                     5, // init_steps
                                     100, // steps
                                     10, // measures
-                                    "metro",
+                                    "metro", // algorithm
                                     100); // samples
 
 
