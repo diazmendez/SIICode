@@ -10,6 +10,7 @@
                 //"${file}",
                 "rngparisi.cpp",
                 "ising.cpp",
+                "protocols.cpp"
                 "main.cpp",
                 "-o",
                 "${fileDirname}/sii"
