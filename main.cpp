@@ -19,7 +19,6 @@ int main(){
 
     thesystem.set_conf(0);
     
-
     protocols::dataThermal  mydatat;
 
     mydatat = protocols::thermal(thesystem, 1.8, // temperature

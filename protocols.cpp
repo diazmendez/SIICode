@@ -6,22 +6,44 @@
 
 
 
+//*** data structures
 
-void protocols::dataThermal::print2file(std::string fname){
+void protocols::dataThermal::print2file(std::string dname){
     std::ofstream f;
 
-    f.open(fname + ".dat");
+    f.open(dname + "observables.dat");
     for (int i=0; i<time.size(); i++){
             
-        f << time[i] << "\t" << energy[i] << "\t" << energy2[i] 
-        << "\t" << energy4[i] << "\t" << magnet[i] << "\t"
-        << magnet2[i] << "\t" << magnet4[i] << std::endl;
+        f << time[i] << "\t" << energy[i] << "\t" << magnet[i] << std::endl;
     }
     f << "\n\n" << std::endl;
     f.close();
 }
 
 
+void protocols::dataRamp::print2file(std::string dname){
+    std::ofstream f;
+
+    f.open(dname + "observables.dat");
+    for (int i=0; i<T.size(); i++){
+            
+        f << T[i] << "\t" << energy[i] << "\t" << magnet[i] 
+        << "\t" << energy2[i] << "\t" << magnet2[i] 
+        << "\t" << energy4[i] << "\t" << magnet4[i] 
+        << std::endl;
+    }
+    f << "\n\n" << std::endl;
+    f.close();
+}
+
+
+
+
+
+
+
+
+//*** functions
 
 
 protocols::dataThermal protocols::thermal(ISystem &system, double T,
@@ -31,18 +53,13 @@ protocols::dataThermal protocols::thermal(ISystem &system, double T,
                     int samples /* =1 */){
 
     dataThermal outcome;
-    double temp;
 
 
 
     // resizing vectors and setting to zero
     outcome.time.resize(measures);  
     outcome.energy.resize(measures);  
-    outcome.energy2.resize(measures);  
-    outcome.energy4.resize(measures);  
     outcome.magnet.resize(measures); 
-    outcome.magnet2.resize(measures); 
-    outcome.magnet4.resize(measures); 
     outcome.configuration.resize(measures);
     for (int i=0; i<measures; i++){
         outcome.configuration[i].resize(system.l2);
@@ -65,7 +82,7 @@ protocols::dataThermal protocols::thermal(ISystem &system, double T,
         if (conf!=-7) {
             system.set_conf(conf);
         } else {
-            system.copy_conf(sys0); // senseless for s=0
+            system.copy_conf(sys0); // redundant for s=0
         }
 
 
@@ -84,14 +101,8 @@ protocols::dataThermal protocols::thermal(ISystem &system, double T,
                                     system.metro_flips(system.l2*msteps);
 
             // gathering data
-            temp=system.nenergy();
-            outcome.energy[i] += temp;
-            outcome.energy2[i] += temp*temp;
-            outcome.energy4[i] += temp*temp*temp*temp;
-            temp=system.nmagnet();
-            outcome.magnet[i] += temp;
-            outcome.magnet2[i] += temp*temp;
-            outcome.magnet4[i] += temp*temp*temp*temp;
+            outcome.energy[i] += system.nenergy();
+            outcome.magnet[i] += system.nmagnet();
 
 
             if (s==0){ // time & snapshots only from the first sample
@@ -110,11 +121,7 @@ protocols::dataThermal protocols::thermal(ISystem &system, double T,
     // taking averages
     for (int i=0;i<measures;i++){
         outcome.energy[i] = outcome.energy[i]/samples;
-        outcome.energy2[i] = outcome.energy2[i]/samples;
-        outcome.energy4[i] = outcome.energy4[i]/samples;
         outcome.magnet[i] = outcome.magnet[i]/samples;
-        outcome.magnet2[i] = outcome.magnet2[i]/samples;
-        outcome.magnet4[i] = outcome.magnet4[i]/samples;
     }
 
     return outcome;
