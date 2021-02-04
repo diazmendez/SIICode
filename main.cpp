@@ -12,11 +12,13 @@ namespace protocols {
 
     typedef struct dataThermal {
         std::vector<double> time, energy, magnet;
+        std::vector<double> energy2, energy4, magnet2, magnet4;
         std::vector<std::vector<double>> configuration;
 
         void print2file(std::string fname){
             std::ofstream f;
-            f.open(fname);
+
+            f.open(fname + ".dat");
             for (int i=0; i<time.size(); i++){
                 
                 f << time[i] << "\t" << energy[i] 
@@ -26,12 +28,6 @@ namespace protocols {
             f.close();
         }
 
-        //~dataThermal(){
-        //    time.clear();
-        //    energy.clear();
-        //    magnet.clear();
-        //    configuration.clear();
-        //}
     } dataThermal;
 
 
@@ -134,33 +130,26 @@ namespace protocols {
 
 int main(){
 
-    int l = 20;
+    int l = 64;
     int l2=l*l;
-
-    std::cout << "hello world" << std::endl;
 
     ISystem thesystem(l);
 
     thesystem.set_conf(0);
     
-    std::cout << "  -----------------------------  " << std::endl;
 
     protocols::dataThermal  mydatat;
 
     mydatat = protocols::thermal(thesystem, 1.8, // temperature
                                     0, // configuration (featured -7)
-                                    5, // init_steps
+                                    0, // init_steps
                                     100, // steps
-                                    10, // measures
+                                    20, // measures
                                     "metro", // algorithm
                                     100); // samples
 
 
-    mydatat.print2file("datat.txt");
-
-    
-    std::cout << "en -> " << mydatat.energy[9] << std::endl;
-
+    mydatat.print2file("scratch/datat");
 
 
 
