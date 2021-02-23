@@ -20,8 +20,9 @@ ISite::ISite(){
 
 //** System
 
-ISystem::ISystem(int L){
-    l=L;
+ISystem::ISystem(int L)
+    : l(L){
+    
     l2=l*l;
     T=1e-10;
 
@@ -32,6 +33,56 @@ ISystem::ISystem(int L){
     set_conf(1); 
 
 }
+
+ISystem::ISystem(int L, int conf)
+    : l(L){
+
+    l2=l*l;
+    T=1e-10;
+
+    site.reserve(l2);
+    deltaE.reserve(l2);
+ 
+    set_neighbours();
+    set_conf(conf); 
+
+}
+
+ISystem::ISystem(int L, int conf, double temperature)
+    : l(L){
+    
+    l2=l*l;
+    T=(temperature>0)?temperature:1e-10;
+
+    site.reserve(l2);
+    deltaE.reserve(l2);
+ 
+    set_neighbours();
+    set_conf(conf); 
+
+}
+
+ISystem::ISystem(const ISystem& other)
+    :l(other.l), T(other.T), energy(other.energy), 
+    magnet(other.magnet){
+
+    l2=l*l;
+    site.reserve(l2);
+    deltaE.reserve(l2);
+
+    for(int i; i<l2; i++){
+        site[i].spin = other.site[i].spin;
+        site[i].field = other.site[i].field;
+        for (int j=0;j<4;j++){
+            site[i].neighbour[j]=other.site[i].neighbour[j];
+        }
+        deltaE[i]=other.deltaE[i];
+    }
+
+}
+
+
+
 
 // sets a spin configuration and calls set_deltaE
 void ISystem::set_conf(int c){
@@ -225,8 +276,6 @@ void ISystem::copy_conf(ISystem &source){
 
     set_conf(-7); 
 
-
 }
-
 
 

@@ -11,7 +11,7 @@
 void protocols::dataThermal::print2file(std::string dname){
     std::ofstream f;
 
-    f.open(dname + "observables.dat");
+    f.open(dname + "/observables.dat");
     for (int i=0; i<time.size(); i++){
             
         f << time[i] << "\t" << energy[i] << "\t" << magnet[i] << std::endl;
@@ -69,10 +69,11 @@ protocols::dataThermal protocols::thermal(ISystem &system, double T,
     system.T=T;
 
     // keep featured initial configuration 
-    ISystem sys0(system.l);
-    if (conf == -7) {
-        sys0.copy_conf(system);
-    }
+    ISystem sys0(system);
+    //.l);
+    //if (conf == -7) {
+    //    sys0.copy_conf(system);
+    // }
 
     int msteps = (int) steps/measures;
 

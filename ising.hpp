@@ -34,7 +34,10 @@ class ISystem{
         
 
         //methods
-        ISystem(int);
+        ISystem(int L);
+        ISystem(int L, int conf);
+        ISystem(int L, int conf, double temperature);
+        ISystem(const ISystem&);
         void metro_flips(int);
         void set_conf(int);
         double nenergy();
